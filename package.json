@@ -1,0 +1,23 @@
+{
+  "name": "coins",
+  "version": "1.0.0",
+  "description": "Easy cryptocurrency middleware for Lotion",
+  "main": "index.js",
+  "dependencies": {
+    "json-stable-stringify": "^1.0.1",
+    "secp256k1": "^3.3.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "lotion",
+    "tendermint",
+    "cosmos",
+    "crypto",
+    "cryptocurrency"
+  ],
+  "author": "Matt Bell <mappum@gmail.com>",
+  "license": "MIT"
+}
