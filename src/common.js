@@ -60,6 +60,10 @@ function replace (obj, replacer) {
   }
 }
 
+function buffersToBase64 (obj) {
+  replace(obj, bufferToBase64Replacer)
+}
+
 function base64ToBuffers (obj) {
   replace(obj, base64ToBufferReplacer)
 }
@@ -71,5 +75,6 @@ module.exports = {
   burnHandler,
   deepClone,
   stringify,
+  buffersToBase64,
   base64ToBuffers
 }

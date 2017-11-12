@@ -1,10 +1,5 @@
-let {
-  burnHandler,
-  deepClone,
-  stringify,
-  sha256,
-  base64ToBuffers
-} = require('./common.js')
+let { burnHandler, base64ToBuffers } = require('./common.js')
+let getSigHash = require('./sigHash.js')
 
 function coins (handlers) {
   // specify default fee handler if none given
@@ -37,23 +32,20 @@ function coins (handlers) {
   function processOutput (output, tx, state) {
     let onOutput = getHandler(output.type, 'onOutput')
     let subState = state[output.type]
-    onOutput(input, tx, subState)
+    onOutput(output, tx, subState)
   }
 
-  // TODO: gernerate initial state obects at genesis
+  // TODO: generate initial substate objects at genesis
 
   // returns a lotion tx handler func
   return function coinsTxHandler (state, tx) {
     // buffer values are stored in the tx as base64 strings,
     // convert them back to buffers
     base64ToBuffers(tx)
-    console.log(tx)
 
-    let { inputs, outputs } = tx
-
-    // ensure tx has inputs and outputs arrays
-    putArrayCheck(inputs)
-    putArrayCheck(outputs)
+    // ensure tx has to and from
+    let inputs = putArrayCheck(tx.from)
+    let outputs = putArrayCheck(tx.to)
 
     // simple input/output checks (must have types and amounts)
     inputs.forEach(putCheck)
@@ -68,27 +60,30 @@ function coins (handlers) {
 
     // add properties to tx object
     // TODO: use a getter func (and cache the result)
-    tx.sigHash = getSigHash({ inputs, outputs })
+    tx.sigHash = getSigHash({ from: inputs, to: outputs })
 
     // process inputs and outputs
     for (let input of inputs) {
       processInput(input, tx, state)
     }
     for (let output of outputs) {
-      processOutput(input, tx, state)
+      processOutput(output, tx, state)
     }
 
-    console.log('!')
+    return state
   }
 }
 
+// checks for the input or output array
+// if not an array, wraps the value in an array
 function putArrayCheck (puts) {
   if (puts == null) {
-    throw Error('Must have both inputs and outputs arrays')
+    throw Error('Must have `to` and `from` values')
   }
   if (!Array.isArray(puts)) {
-    throw Error('Inputs and outputs must be arrays')
+    puts = [ puts ]
   }
+  return puts
 }
 
 // simple structure check for an input or an output
@@ -116,26 +111,6 @@ function sumAmounts (puts) {
     throw Error('Amount overflow')
   }
   return sum
-}
-
-function getSigHash (tx) {
-  tx = deepClone(tx)
-
-  // exclude properties of inputs named "signature" or "signatures"
-  // (we can't check the signature against the hash of the signature!)
-  let { inputs } = tx
-  for (let input of inputs) {
-    for (let key in input) {
-      if (key === 'signature' || key === 'signatures') {
-        delete input[key]
-      }
-    }
-  }
-
-  // stringify tx deterministically (and convert buffers to strings)
-  // then return sha256 hash of that
-  let txString = stringify(tx)
-  return sha256(txString)
 }
 
 module.exports = coins
