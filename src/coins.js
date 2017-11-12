@@ -1,7 +1,8 @@
 let { burnHandler, base64ToBuffers } = require('./common.js')
 let getSigHash = require('./sigHash.js')
+let pubkeyCoin = require('./pubkeyCoin.js')
 
-function coins (handlers) {
+function coins (handlers = { pubkey: pubkeyCoin }) {
   // specify default fee handler if none given
   if (handlers.fee == null) {
     // TODO: use a better default fee handler

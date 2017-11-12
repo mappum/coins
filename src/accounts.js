@@ -1,9 +1,9 @@
-function accounts ({ onSpend, deriveAddress }) {
+function accounts ({ onSpend, getAddress }) {
   if (typeof onSpend !== 'function') {
     throw Error('Must specify an onSpend function')
   }
-  if (typeof deriveAddress !== 'function') {
-    throw Error('Must specify a deriveAddress function')
+  if (typeof getAddress !== 'function') {
+    throw Error('Must specify a getAddress function')
   }
 
   return {
@@ -12,7 +12,7 @@ function accounts ({ onSpend, deriveAddress }) {
       let { amount, sequence } = input
 
       // account must exist
-      let address = deriveAddress(input)
+      let address = getAddress(input)
       if (state[address] == null) {
         throw Error(`Non-existent account "${address}"`)
       }
@@ -36,11 +36,11 @@ function accounts ({ onSpend, deriveAddress }) {
 
     // for each output of this type, add to account
     onOutput (output, state) {
-      // TODO: use proxy to ensure deriveAddress doesn't try
+      // TODO: use proxy to ensure getAddress doesn't try
       // to access a nonexistent property. this helps prevent
       // users from creating invalid transactions that pay
       // into a "null address" (e.g. hash of 'undefined')
-      let address = deriveAddress(output)
+      let address = getAddress(output)
 
       // initialize empty accounts
       if (state[address] == null) {

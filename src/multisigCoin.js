@@ -3,14 +3,17 @@ let accounts = require('./accounts.js')
 let { addressHash } = require('./common.js')
 
 module.exports = accounts({
-  deriveAddress ({ threshold, pubkeys }) {
+  // address is hash of threshold combined with list of pubkeys
+  getAddress (inputOrOutput) {
+    let { threshold, pubkeys } = inputOrOutput
     return addressHash(`${threshold}/${pubkeys.join()}`)
   },
 
-  onSpend ({ threshold, pubkeys }, { signatures }, sigHash) {
+  // can only spend if there are at least `threshold` valid sigs
+  onSpend ({ threshold, pubkeys, signatures }, { sigHash }) {
     // verify and count valid signatures
     let validSigs = 0
-    for (let i = 0; i < pubkeys.length) {
+    for (let i = 0; i < pubkeys.length; i++) {
       let pubkey = pubkeys[i]
       let signature = signatures[i]
 

@@ -3,8 +3,9 @@ let accounts = require('./accounts.js')
 let { addressHash } = require('./common.js')
 
 module.exports = accounts({
-  deriveAddress ({ pubkey }) {
-    return addressHash(pubkey)
+  // address is hash of pubkey
+  getAddress (inputOrOutput) {
+    return addressHash(inputOrOutput.pubkey)
   },
 
   // specify rule for taking money out of account
