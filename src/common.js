@@ -9,7 +9,8 @@ let sha256 = hashFunc('sha256')
 let ripemd160 = hashFunc('ripemd160')
 
 function addressHash (data) {
-  return ripemd160(sha256(data)).toString('base64')
+  let hash = ripemd160(sha256(data)).toString('base64')
+  return hash.replace(/=/g, '') // remove the equals signs
 }
 
 let burnHandler = {
