@@ -35,7 +35,7 @@ function accounts ({ onSpend, getAddress }) {
     },
 
     // for each output of this type, add to account
-    onOutput ({ address, amount }, state) {
+    onOutput ({ address, amount }, tx, state) {
       // initialize empty accounts
       if (state[address] == null) {
         state[address] = { balance: 0, sequence: 0 }
