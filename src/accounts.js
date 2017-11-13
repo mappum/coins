@@ -35,20 +35,14 @@ function accounts ({ onSpend, getAddress }) {
     },
 
     // for each output of this type, add to account
-    onOutput (output, state) {
-      // TODO: use proxy to ensure getAddress doesn't try
-      // to access a nonexistent property. this helps prevent
-      // users from creating invalid transactions that pay
-      // into a "null address" (e.g. hash of 'undefined')
-      let address = getAddress(output)
-
+    onOutput ({ address, amount }, state) {
       // initialize empty accounts
       if (state[address] == null) {
         state[address] = { balance: 0, sequence: 0 }
       }
 
       // add to account
-      state[address].balance += output.amount
+      state[address].balance += amount
     }
   }
 }

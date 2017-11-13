@@ -1,4 +1,8 @@
-let { burnHandler, base64ToBuffers } = require('./common.js')
+let {
+  burnHandler,
+  base64ToBuffers,
+  normalizeTx
+} = require('./common.js')
 let getSigHash = require('./sigHash.js')
 let pubkeyCoin = require('./pubkeyCoin.js')
 
@@ -45,8 +49,13 @@ function coins (handlers = { pubkey: pubkeyCoin }) {
     base64ToBuffers(tx)
 
     // ensure tx has to and from
-    let inputs = putArrayCheck(tx.from)
-    let outputs = putArrayCheck(tx.to)
+    if (tx.from == null || tx.to == null) {
+      throw Error('Must have `to` and `from` values')
+    }
+
+    normalizeTx(tx)
+    let inputs = tx.from
+    let outputs = tx.to
 
     // simple input/output checks (must have types and amounts)
     inputs.forEach(putCheck)
@@ -75,18 +84,6 @@ function coins (handlers = { pubkey: pubkeyCoin }) {
   }
 }
 
-// checks for the input or output array
-// if not an array, wraps the value in an array
-function putArrayCheck (puts) {
-  if (puts == null) {
-    throw Error('Must have `to` and `from` values')
-  }
-  if (!Array.isArray(puts)) {
-    puts = [ puts ]
-  }
-  return puts
-}
-
 // simple structure check for an input or an output
 function putCheck (put) {
   if (typeof put.type !== 'string') {
@@ -96,13 +93,13 @@ function putCheck (put) {
     throw Error('Inputs and outputs must have a number `amount`')
   }
   if (put.amount < 0) {
-    throw Error('Amounts must be >= 0')
+    throw Error('Amount must be >= 0')
   }
   if (!Number.isInteger(put.amount)) {
-    throw Error('Amounts must be integers')
+    throw Error('Amount must be an integer')
   }
   if (Number > Number.MAX_SAFE_INTEGER) {
-    throw Error('Amounts must be < 2^53')
+    throw Error('Amount must be < 2^53')
   }
 }
 

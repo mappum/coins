@@ -4,8 +4,8 @@ let { addressHash } = require('./common.js')
 
 module.exports = accounts({
   // address is hash of threshold combined with list of pubkeys
-  getAddress (inputOrOutput) {
-    let { threshold, pubkeys } = inputOrOutput
+  getAddress (input) {
+    let { threshold, pubkeys } = input
     return addressHash(`${threshold}/${pubkeys.join()}`)
   },
 

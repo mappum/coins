@@ -1,6 +1,6 @@
 let { post } = require('axios')
 let secp = require('secp256k1')
-let { buffersToBase64, sha256 } = require('./src/common.js')
+let { buffersToBase64, sha256, addressHash } = require('./src/common.js')
 let getSigHash = require('./src/sigHash.js')
 
 let priv = sha256('lol')
@@ -8,6 +8,7 @@ let pub = secp.publicKeyCreate(priv)
 
 let priv2 = sha256('wtf')
 let pub2 = secp.publicKeyCreate(priv2)
+let addr2 = addressHash(pub2)
 
 async function main () {
   let tx = {
@@ -20,7 +21,7 @@ async function main () {
     to: {
       type: 'pubkey',
       amount: 5,
-      pubkey: pub2
+      address: addr2
     }
   }
 

@@ -68,6 +68,11 @@ function base64ToBuffers (obj) {
   replace(obj, base64ToBufferReplacer)
 }
 
+function normalizeTx (tx) {
+  if (!Array.isArray(tx.from)) tx.from = [ tx.from ]
+  if (!Array.isArray(tx.to)) tx.to = [ tx.to ]
+}
+
 module.exports = {
   sha256,
   ripemd160,
@@ -76,5 +81,6 @@ module.exports = {
   deepClone,
   stringify,
   buffersToBase64,
-  base64ToBuffers
+  base64ToBuffers,
+  normalizeTx
 }
