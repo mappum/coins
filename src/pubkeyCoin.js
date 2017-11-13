@@ -10,7 +10,7 @@ module.exports = accounts({
 
   // specify rule for taking money out of account
   // (must have a valid signature from this account's pubkey)
-  onSpend ({ pubkey, signature }, { sigHash, consumeGas }) {
+  onSpend ({ pubkey, signature }, { sigHash }) {
     // verify signature
     if (!secp256k1.verify(sigHash, signature, pubkey)) {
       throw Error('Invalid signature')

@@ -5,8 +5,14 @@ let {
 } = require('./common.js')
 let getSigHash = require('./sigHash.js')
 let pubkeyCoin = require('./pubkeyCoin.js')
+let multisigCoin = require('./multisigCoin.js')
 
-function coins (handlers = { pubkey: pubkeyCoin }) {
+const defaultHandlers = {
+  pubkey: pubkeyCoin,
+  multisig: multisigCoin
+}
+
+function coins (handlers = defaultHandlers) {
   // specify default fee handler if none given
   if (handlers.fee == null) {
     // TODO: use a better default fee handler
