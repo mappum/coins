@@ -1,13 +1,9 @@
-let {
-  deepClone,
-  stringify,
-  sha256,
-  normalizeTx
-} = require('./common.js')
+let { clone, sha256, normalizeTx } = require('./common.js')
+let { stringify } = require('lotion/lib/json.js')
 
 // gets the hash of a transaction to be used for signing
 module.exports = function getSigHash (tx) {
-  tx = deepClone(tx)
+  tx = clone(tx)
   normalizeTx(tx)
 
   // exclude properties of inputs named "signature" or "signatures"

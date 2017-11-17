@@ -1,8 +1,4 @@
-let {
-  burnHandler,
-  base64ToBuffers,
-  normalizeTx
-} = require('./common.js')
+let { burnHandler, normalizeTx } = require('./common.js')
 let getSigHash = require('./sigHash.js')
 let pubkeyCoin = require('./pubkeyCoin.js')
 let multisigCoin = require('./multisigCoin.js')
@@ -12,14 +8,19 @@ const defaultHandlers = {
   multisig: multisigCoin
 }
 
-function coins (handlers = defaultHandlers) {
+function coins (handlers = {}) {
+  // get handlers from `defaultHandlers`, and optionally add more or
+  // override from `handlers`
+  Object.assign({}, defaultHandlers, handlers)
+
   // specify default fee handler if none given
   if (handlers.fee == null) {
     // TODO: use a better default fee handler
     handlers.fee = burnHandler
   }
 
-  function getHandler (type, funcName) {
+  // accesses a method from a handler
+  function getHandlerMethod (type, funcName) {
     // get handler object
     let handler = handlers[type]
     if (handler == null) {
@@ -34,31 +35,31 @@ function coins (handlers = defaultHandlers) {
     return func
   }
 
+  // runs an input
   function processInput (input, tx, state) {
-    let onInput = getHandler(input.type, 'onInput')
+    let onInput = getHandlerMethod(input.type, 'onInput')
     let subState = state[input.type]
     onInput(input, tx, subState)
   }
 
+  // runs an output
   function processOutput (output, tx, state) {
-    let onOutput = getHandler(output.type, 'onOutput')
+    let onOutput = getHandlerMethod(output.type, 'onOutput')
     let subState = state[output.type]
     onOutput(output, tx, subState)
   }
 
   // TODO: generate initial substate objects at genesis
 
-  // returns a lotion tx handler func
+  // lotion tx handler func
   return function coinsTxHandler (state, tx) {
-    // buffer values are stored in the tx as base64 strings,
-    // convert them back to buffers
-    base64ToBuffers(tx)
-
     // ensure tx has to and from
     if (tx.from == null || tx.to == null) {
       throw Error('Must have `to` and `from` values')
     }
 
+    // convert tx to canonical format
+    // (e.g. ensure `to` and `from` are arrays)
     normalizeTx(tx)
     let inputs = tx.from
     let outputs = tx.to
@@ -104,7 +105,7 @@ function putCheck (put) {
   if (!Number.isInteger(put.amount)) {
     throw Error('Amount must be an integer')
   }
-  if (Number > Number.MAX_SAFE_INTEGER) {
+  if (put.amount > Number.MAX_SAFE_INTEGER) {
     throw Error('Amount must be < 2^53')
   }
 }

@@ -19,59 +19,13 @@ let burnHandler = {
   onOutput () {}
 }
 
-function deepClone (obj, replacer) {
-  let newObj = Array.isArray(obj) ? [] : {}
-  Object.assign(newObj, obj)
-  for (let key in newObj) {
-    if (replacer) {
-      newObj[key] = replacer(newObj[key])
-    }
-    if (typeof newObj[key] === 'object') {
-      newObj[key] = deepClone(newObj[key], replacer)
-    }
-  }
-  return newObj
-}
-
-const base64Prefix = ':base64:'
-
-function bufferToBase64Replacer (value) {
-  if (!Buffer.isBuffer(value)) return value
-  return `${base64Prefix}${value.toString('base64')}`
-}
-function base64ToBufferReplacer (value) {
-  if (typeof value !== 'string') return value
-  if (!value.startsWith(base64Prefix)) return value
-  return Buffer.from(value.slice(base64Prefix.length), 'base64')
-}
-
-// stringifies JSON deterministically, and converts Buffers to
-// base64 strings (prefixed with ":base64:")
-function stringify (obj) {
-  obj = deepClone(obj, bufferToBase64Replacer)
-  return stableStringify(obj)
-}
-
-function replace (obj, replacer) {
-  for (let key in obj) {
-    obj[key] = replacer(obj[key])
-    if (typeof obj[key] === 'object' && !Buffer.isBuffer(obj[key])) {
-      replace(obj[key], replacer)
-    }
-  }
-}
-
-function buffersToBase64 (obj) {
-  replace(obj, bufferToBase64Replacer)
-}
-
-function base64ToBuffers (obj) {
-  replace(obj, base64ToBufferReplacer)
-}
-
 function normalizeTx (tx) {
   if (!Array.isArray(tx.from)) tx.from = [ tx.from ]
   if (!Array.isArray(tx.to)) tx.to = [ tx.to ]
+}
+
+function clone (obj) {
+  return JSON.parse(JSON.stringify(obj))
 }
 
 module.exports = {
@@ -79,9 +33,6 @@ module.exports = {
   ripemd160,
   addressHash,
   burnHandler,
-  deepClone,
-  stringify,
-  buffersToBase64,
-  base64ToBuffers,
-  normalizeTx
+  normalizeTx,
+  clone
 }
