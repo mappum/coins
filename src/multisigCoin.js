@@ -1,8 +1,7 @@
 let secp256k1 = require('secp256k1')
-let accounts = require('./accounts.js')
 let { addressHash } = require('./common.js')
 
-module.exports = accounts({
+module.exports = {
   // address is hash of threshold combined with list of pubkeys
   getAddress (input) {
     let { threshold, pubkeys } = input
@@ -32,4 +31,4 @@ module.exports = accounts({
 
     throw Error('Not enough signatures to meet threshold')
   }
-})
+}

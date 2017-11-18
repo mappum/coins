@@ -1,24 +1,54 @@
-function accounts ({ onSpend, getAddress }) {
-  if (typeof onSpend !== 'function') {
-    throw Error('Must specify an onSpend function')
+function accounts (handlers) {
+  if (handlers == null) {
+    throw Error('Must specify one or more account handlers')
   }
-  if (typeof getAddress !== 'function') {
-    throw Error('Must specify a getAddress function')
+
+  // check if handlers obj is actually a single handler
+  let singleHandler = true
+  try {
+    checkHandler(handlers)
+  } catch (err) {
+    singleHandler = false
+  }
+
+  // ensure handlers implement interface correctly
+  if (singleHandler) {
+    var handler = handlers
+    checkHandler(handler)
+  } else {
+    for (let handler of Object.values(handlers)) {
+      checkHandler(handlers)
+    }
   }
 
   return {
     // on spend, debit from sender's account
     onInput (input, tx, state) {
-      let { amount, sequence } = input
+      let { amount, sequence, accountType } = input
 
-      // account must exist
-      let address = getAddress(input)
-      if (state[address] == null) {
+      if (!Number.isInteger(sequence)) {
+        throw Error('Sequence number must be an integer')
+      }
+      if (typeof accountType !== 'string') {
+        throw Error('Account type must be a string')
+      }
+
+      if (!singleHandler) {
+        // get account handler from 'accountType' value
+        handler = handlers[accountType]
+        if (handler == null) {
+          throw Error(`Unknown account handler "${accountType}"`)
+        }
+      }
+
+      // get account
+      let address = handler.getAddress(input)
+      let account = state[address]
+      if (account == null) {
         throw Error(`Non-existent account "${address}"`)
       }
 
       // verify account balance/sequence
-      let account = state[address]
       if (account.balance < amount) {
         throw Error('Insufficient funds')
       }
@@ -27,7 +57,7 @@ function accounts ({ onSpend, getAddress }) {
       }
 
       // should throw if input is not allowed to spend
-      onSpend(input, tx)
+      handler.onSpend(input, tx)
 
       // debit account
       account.balance -= amount
@@ -43,7 +73,20 @@ function accounts ({ onSpend, getAddress }) {
 
       // add to account
       state[address].balance += amount
+
+      if (state[address].balance > Number.MAX_SAFE_INTEGER) {
+        throw Error('Account balance overflow')
+      }
     }
+  }
+}
+
+function checkHandler ({ onSpend, getAddress }) {
+  if (typeof onSpend !== 'function') {
+    throw Error('Account handler must specify an onSpend function')
+  }
+  if (typeof getAddress !== 'function') {
+    throw Error('Account handler must specify a getAddress function')
   }
 }
 

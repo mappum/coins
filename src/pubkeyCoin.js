@@ -1,8 +1,7 @@
 let secp256k1 = require('secp256k1')
-let accounts = require('./accounts.js')
 let { addressHash } = require('./common.js')
 
-module.exports = accounts({
+module.exports = {
   // address is hash of pubkey
   getAddress (input) {
     return addressHash(input.pubkey)
@@ -16,4 +15,4 @@ module.exports = accounts({
       throw Error('Invalid signature')
     }
   }
-})
+}
