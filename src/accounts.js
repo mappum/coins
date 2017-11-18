@@ -17,7 +17,7 @@ function accounts (handlers) {
     checkHandler(handler)
   } else {
     for (let handler of Object.values(handlers)) {
-      checkHandler(handlers)
+      checkHandler(handler)
     }
   }
 
