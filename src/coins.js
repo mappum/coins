@@ -11,7 +11,7 @@ const defaultHandlers = {
 function coins (handlers = {}) {
   // get handlers from `defaultHandlers`, and optionally add more or
   // override from `handlers`
-  Object.assign({}, defaultHandlers, handlers)
+  handlers = Object.assign({}, defaultHandlers, handlers)
 
   // specify default fee handler if none given
   if (handlers.fee == null) {
