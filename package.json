@@ -1,6 +1,6 @@
 {
   "name": "coins",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Easy cryptocurrency middleware for Lotion",
   "main": "index.js",
   "dependencies": {
