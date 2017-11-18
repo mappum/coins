@@ -2,10 +2,13 @@ let { burnHandler, normalizeTx } = require('./common.js')
 let getSigHash = require('./sigHash.js')
 let pubkeyCoin = require('./pubkeyCoin.js')
 let multisigCoin = require('./multisigCoin.js')
+let accounts = require('./accounts.js')
 
 const defaultHandlers = {
-  pubkey: pubkeyCoin,
-  multisig: multisigCoin
+  accounts: accounts({
+    pubkey: pubkeyCoin,
+    multisig: multisigCoin
+  })
 }
 
 function coins (handlers = {}) {
