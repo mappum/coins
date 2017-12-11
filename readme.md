@@ -1,6 +1,6 @@
 # Coins
 
-`coins` is a flexible, powerful framework for building cryptocurrencies on [Lotion](https://github.com/keppel/lotion) applications.
+`coins` is a flexible, powerful framework for building cryptocurrencies on top of [lotion](https://github.com/keppel/lotion).
 
 ## Installation
 
@@ -10,7 +10,49 @@ Coins requires __node v7.6.0__ or higher.
 $ npm install coins
 ```
 
-## Writing your own advanced coin
+## Usage
+
+### Basic coin usage
+Adding a cryptocurrency to a lotion app just takes two lines of code.
+`app.js`
+```js
+let app = require('lotion')
+let coins = require('coins')
+
+app.use(coins({
+  name: 'kittycoin',
+  initialDistribution: {
+    // map addresses to balances
+    '04oDVBPIYP8h5V1eC1PSc/JU6Vo': 10,
+    'OGccsuLV2xuoDau1XRc6hc7uO24': 20
+  }
+}))
+
+app.listen(3000)
+```
+
+then build a wallet
+`wallet.js`:
+```js
+let lotion = require('lotion')
+let coins = require('coins')
+let client = await lotion.connect(APP_GCI)
+
+let wallet = coins.wallet(client)
+
+// wallet methods:
+let address = wallet.getAddress()
+console.log(address) // 'OGccsuLV2xuoDau1XRc6hc7uO24'
+
+let balance = await wallet.getBalance()
+console.log(balance) // 20
+
+let result = await wallet.send('04oDVBPIYP8h5V1eC1PSc/JU6Vo', 5)
+console.log(result) // { height: 42 }
+```
+
+
+### Writing your own advanced coin
 
 `chain.js`:
 ```js
