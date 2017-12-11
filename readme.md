@@ -111,11 +111,11 @@ let client = await lotion.connect(YOUR_APP_GCI)
 let result = await client.send({
   from: [
     // tx inputs. each must include an amount:
-    { amount: 4, type: 'testcoin', senderAddress: 'judd' }
+    { amount: 4, type: 'my-module', senderAddress: 'judd' }
   ],
   to: [
     // tx outputs. sum of amounts must equal sum of amounts of inputs.
-    { amount: 4, type: 'testcoin', receiverAddress: 'matt' }
+    { amount: 4, type: 'my-module', receiverAddress: 'matt' }
   ]
 })
 
