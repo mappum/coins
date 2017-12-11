@@ -10,7 +10,7 @@ Coins requires __node v7.6.0__ or higher.
 $ npm install coins
 ```
 
-## Usage
+## Writing your own advanced coin
 
 `chain.js`:
 ```js
@@ -49,14 +49,35 @@ app.use(coins({
 
       // usually you'll just want to mutate the state
       // to increment the balance of some address.
-      state[output.address] = (state[output.address] || 0) + output.amount
+      state[output.receiverAddress] = (state[output.receiverAddress] || 0) + output.amount
     }
   } 
 }))
 
-
+app.listen(3000)
 ```
 
+run `node chain.js`, then write
+`client.js`:
+```js
+let lotion = require('lotion')
+let client = await lotion.connect(YOUR_APP_GCI)
+
+let result = await client.send({
+  from: [
+    // tx inputs. each must include an amount:
+    { amount: 4, type: 'testcoin', senderAddress: 'judd' }
+  ],
+  to: [
+    // tx outputs. sum of amounts must equal sum of amounts of inputs.
+    { amount: 4, type: 'testcoin', receiverAddress: 'matt' }
+  ]
+})
+
+console.log(result)
+// { ok: true, height: 42 }
+
+```
 ## License
 
 MIT
