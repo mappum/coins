@@ -16,8 +16,10 @@ $ npm install coins
 Adding a cryptocurrency to a lotion app just takes two lines of code.
 `app.js`
 ```js
-let app = require('lotion')
+let lotion = require('lotion')
 let coins = require('coins')
+
+let app = lotion({ initialState: {} })
 
 app.use(coins({
   name: 'kittycoin',
