@@ -1,10 +1,10 @@
 # Coins
 
-`coins` is a flexible, powerful framework for building cryptocurrencies on top of [lotion](https://github.com/keppel/lotion).
+`coins` is a flexible, powerful framework for building cryptocurrencies on top of [Lotion](https://github.com/keppel/lotion).
 
 ## Installation
 
-Coins requires __node v7.6.0__ or higher.
+`coins` requires __node v7.6.0__ or higher.
 
 ```bash
 $ npm install coins
