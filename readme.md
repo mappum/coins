@@ -23,7 +23,7 @@ let app = lotion({ initialState: {} })
 
 app.use(coins({
   name: 'kittycoin',
-  initialDistribution: {
+  initialBalances: {
     // map addresses to balances
     '04oDVBPIYP8h5V1eC1PSc/JU6Vo': 10,
     'OGccsuLV2xuoDau1XRc6hc7uO24': 20
@@ -71,8 +71,8 @@ app.use(coins({
       'judd': 10,
       'matt': 10
     },
-    
-    modules: { 
+
+    modules: {
       'my-module': {
         onInput(input, state) {
           // this function is called when coins of
@@ -89,7 +89,7 @@ app.use(coins({
         },
 
         onOutput(output, state) {
-          // here's where you handle coins of this type 
+          // here's where you handle coins of this type
           // being received as a tx output.
 
           // usually you'll just want to mutate the state
@@ -98,7 +98,7 @@ app.use(coins({
         }
       }
     }
-  } 
+  }
 }))
 
 app.listen(3000)
@@ -128,5 +128,3 @@ console.log(result)
 ## License
 
 MIT
-
-

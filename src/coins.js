@@ -11,9 +11,11 @@ const defaultHandlers = {
   })
 }
 
-function coins (handlers = {}) {
+function coins (opts = {}) {
+  let { initialBalances, handlers } = opts
+
   // get handlers from `defaultHandlers`, and optionally add more or
-  // override from `handlers`
+  // override from `opts.handlers`
   handlers = Object.assign({}, defaultHandlers, handlers)
 
   // specify default fee handler if none given
@@ -52,10 +54,20 @@ function coins (handlers = {}) {
     onOutput(output, tx, subState)
   }
 
-  // TODO: generate initial substate objects at genesis
+  // lotion initializer func
+  function coinsInitializer (state) {
+    // TODO: generate initial substate objects for handlers
+
+    // set initial accounts values
+    state.accounts = {}
+    for (let address in initialBalances) {
+      let balance = initialBalances[address]
+      state.accounts[address] = { sequence: 0, balance }
+    }
+  }
 
   // lotion tx handler func
-  return function coinsTxHandler (state, tx) {
+  function coinsTxHandler (state, tx) {
     // ensure tx has to and from
     if (tx.from == null || tx.to == null) {
       throw Error('Must have `to` and `from` values')
@@ -92,6 +104,16 @@ function coins (handlers = {}) {
 
     return state
   }
+
+  return [
+    {
+      type: 'initializer',
+      middleware: coinsInitializer
+    }, {
+      type: 'tx',
+      middleware: coinsTxHandler
+    }
+  ]
 }
 
 // simple structure check for an input or an output

@@ -14,13 +14,11 @@ let addr2 = addressHash(pub2)
 async function main () {
   let tx = {
     from: {
-      type: 'pubkey',
       amount: 5,
       pubkey: pub,
       sequence: 0
     },
     to: {
-      type: 'pubkey',
       amount: 5,
       address: addr2
     }
