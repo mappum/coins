@@ -13,7 +13,7 @@ $ npm install coins
 ## Usage
 
 ### Basic coin usage
-Adding a cryptocurrency to a lotion app just takes two lines of code.
+Adding a cryptocurrency to a lotion app just takes a few lines of code.
 `app.js`
 ```js
 let lotion = require('lotion')
