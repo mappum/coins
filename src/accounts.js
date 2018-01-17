@@ -77,6 +77,17 @@ function accounts (handlers) {
       if (state[address].balance > Number.MAX_SAFE_INTEGER) {
         throw Error('Account balance overflow')
       }
+    },
+
+    initialize (state, chainInfo, coinOpts) {
+      let initialBalances = coinOpts.initialBalances
+      if (initialBalances == null) return
+
+      // inititialize accounts specified in coin options
+      for (let address in initialBalances) {
+        let balance = initialBalances[address]
+        state[address] = { sequence: 0, balance }
+      }
     }
   }
 }

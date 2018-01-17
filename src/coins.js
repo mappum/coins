@@ -55,14 +55,14 @@ function coins (opts = {}) {
   }
 
   // lotion initializer func
-  function coinsInitializer (state) {
-    // TODO: generate initial substate objects for handlers
-
-    // set initial accounts values
-    state.accounts = {}
-    for (let address in initialBalances) {
-      let balance = initialBalances[address]
-      state.accounts[address] = { sequence: 0, balance }
+  function coinsInitializer (state, chainInfo) {
+    // initialize handlers
+    for (let handlerName in handlers) {
+      let { initialState, initialize } = handlers[handlerName]
+      state[handlerName] = initialState || {}
+      if (initialize) {
+        initialize(state[handlerName], chainInfo, opts)
+      }
     }
   }
 
