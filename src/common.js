@@ -1,5 +1,6 @@
 let { createHash } = require('crypto')
 let stableStringify = require('json-stable-stringify')
+let base58check = require('bs58check')
 
 function hashFunc (algo) {
   return (data) => createHash(algo).update(data).digest()
@@ -9,8 +10,8 @@ let sha256 = hashFunc('sha256')
 let ripemd160 = hashFunc('ripemd160')
 
 function addressHash (data) {
-  let hash = ripemd160(sha256(data)).toString('base64')
-  return hash.replace(/=/g, '') // remove the equals signs
+  let hash = ripemd160(sha256(data))
+  return base58check.encode(hash)
 }
 
 let burnHandler = {
