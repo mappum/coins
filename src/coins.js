@@ -1,13 +1,16 @@
 let { burnHandler, normalizeTx } = require('./common.js')
 let getSigHash = require('./sigHash.js')
-let pubkeyCoin = require('./pubkeyCoin.js')
-let multisigCoin = require('./multisigCoin.js')
+let ed25519Account = require('./ed25519Account.js')
+let secp256k1Account = require('./secp256k1Account.js')
+let multisigAccount = require('./multisigAccount.js')
 let accounts = require('./accounts.js')
 
 const defaultHandlers = {
   accounts: accounts({
-    pubkey: pubkeyCoin,
-    multisig: multisigCoin
+    // types of accounts
+    ed25519: ed25519Account,
+    secp256k1: secp256k1Account,
+    multisig: multisigAccount
   })
 }
 
