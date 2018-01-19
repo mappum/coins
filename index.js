@@ -1,8 +1,9 @@
 module.exports = require('./src/coins.js')
 Object.assign(module.exports, {
   // handlers
-  pubkeyCoin: require('./src/pubkeyCoin.js'),
-  multisigCoin: require('./src/multisigCoin.js'),
+  ed25519Account: require('./src/ed25519Account.js'),
+  secp256k1Account: require('./src/secp256k1Account.js'),
+  multisigAccount: require('./src/multisigAccount.js'),
   burnHandler: require('./src/common.js').burnHandler,
 
   // handler wrapper
