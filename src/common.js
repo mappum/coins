@@ -35,9 +35,9 @@ function normalizeTx (tx) {
     if (input.type != null) continue
     input.type = 'accounts'
 
-    // infer accountType (either pubkey or multisig)
+    // infer accountType (default to secp or multisig)
     if (input.accountType != null) continue
-    input.accountType = input.pubkey ? 'pubkey' : 'multisig'
+    input.accountType = input.pubkey ? 'secp256k1' : 'multisig'
   }
 
   // if output has address and no type, infer that type is 'accounts'
