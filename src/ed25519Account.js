@@ -1,4 +1,9 @@
-let ed25519 = require('ed25519-supercop')
+let ed25519 = require('supercop.js')
+try {
+  // try to load native version
+  ed25519 = require('ed25519-supercop')
+} catch (err) {}
+
 let { addressHash } = require('./common.js')
 
 module.exports = {
