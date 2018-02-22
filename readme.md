@@ -39,8 +39,10 @@ then build a wallet
 let lotion = require('lotion')
 let coins = require('coins')
 let client = await lotion.connect(APP_GCI)
+let { randomBytes } = require('crypto')
 
-let wallet = coins.wallet(client)
+let priv = randomBytes(32)
+let wallet = coins.wallet(priv, client)
 
 // wallet methods:
 let address = wallet.getAddress()
