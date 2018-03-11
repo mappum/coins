@@ -98,8 +98,8 @@ app.use(coins({
         }
       }
     }
-  }
-}))
+  })
+)
 
 app.listen(3000)
 ```
