@@ -63,9 +63,8 @@ function coins (opts = {}) {
     for (let handlerName in handlers) {
       let { initialState, initialize } = handlers[handlerName]
       state[handlerName] = initialState || {}
-      if (initialize) {
+      if (initialize)
         initialize(state[handlerName], chainInfo, opts)
-      }
     }
   }
 
