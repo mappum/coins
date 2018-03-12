@@ -1,5 +1,5 @@
 let secp = require('secp256k1')
-let coins = require('coins')
+let coins = require('../index')
 let { randomBytes } = require('crypto')
 
 module.exports = function(priv, client) {
