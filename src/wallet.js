@@ -17,18 +17,19 @@ module.exports = function(priv, client) {
     priv: creds.priv,
     pub: creds.pub,
     getBalance: async function() {
-      try {
-        let balance = await client.state.accounts[creds.address].balance
-        return balance
-      } catch (e) {
+      let account = await client.state.accounts[creds.address]
+      if (account) {
+        return account.balance
+      } else {
         return 0
       }
     },
     send: async function(address, amount) {
+      let account = await client.state.accounts[creds.address]
       let tx = {
         from: {
           amount: amount,
-          sequence: await client.state.accounts[creds.address].sequence,
+          sequence: account ? account.sequence : 0,
           pubkey: creds.pub
         },
         to: { amount, address }
