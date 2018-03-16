@@ -44,17 +44,17 @@ function coins (opts = {}) {
   }
 
   // runs an input
-  function processInput (input, tx, state) {
+  function processInput (input, tx, state, chain) {
     let onInput = getHandlerMethod(input.type, 'onInput')
     let subState = state[input.type]
-    onInput(input, tx, subState)
+    onInput(input, tx, subState, chain)
   }
 
   // runs an output
-  function processOutput (output, tx, state) {
+  function processOutput (output, tx, state, chain) {
     let onOutput = getHandlerMethod(output.type, 'onOutput')
     let subState = state[output.type]
-    onOutput(output, tx, subState)
+    onOutput(output, tx, subState, chain)
   }
 
   // lotion initializer func
@@ -70,7 +70,7 @@ function coins (opts = {}) {
   }
 
   // lotion tx handler func
-  function coinsTxHandler (state, tx) {
+  function coinsTxHandler (state, tx, chain) {
     // ensure tx has to and from
     if (tx.from == null || tx.to == null) {
       throw Error('Must have `to` and `from` values')
@@ -99,10 +99,10 @@ function coins (opts = {}) {
 
     // process inputs and outputs
     for (let input of inputs) {
-      processInput(input, tx, state)
+      processInput(input, tx, state, chain)
     }
     for (let output of outputs) {
-      processOutput(output, tx, state)
+      processOutput(output, tx, state, chain)
     }
 
     return state
