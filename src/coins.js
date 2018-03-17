@@ -109,6 +109,14 @@ function coins (opts = {}) {
     return state
   }
 
+  function coinsBlockHandler (state, chain) {
+    for (let handlerName in handlers) {
+      let blockHandler = handlers[handlerName].onBlock
+      if (blockHandler == null) continue
+      blockHandler(state[handlerName], chain)
+    }
+  }
+
   return [
     {
       type: 'initializer',
@@ -119,6 +127,9 @@ function coins (opts = {}) {
     }, {
       type: 'tx',
       middleware: coinsTxHandler
+    }, {
+      type: 'block',
+      middleware: coinsBlockHandler
     }
   ]
 }
