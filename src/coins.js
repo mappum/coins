@@ -1,3 +1,4 @@
+let clauses = require('clauses')
 let { burnHandler, normalizeTx } = require('./common.js')
 let getSigHash = require('./sigHash.js')
 let ed25519Account = require('./ed25519Account.js')
@@ -112,6 +113,9 @@ function coins (opts = {}) {
     {
       type: 'initializer',
       middleware: coinsInitializer
+    }, {
+      type: 'tx',
+      middleware: clauses
     }, {
       type: 'tx',
       middleware: coinsTxHandler
