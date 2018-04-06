@@ -25,7 +25,7 @@ app.use(coins({
   name: 'kittycoin',
   initialBalances: {
     // map addresses to balances
-    '04oDVBPIYP8h5V1eC1PSc/JU6Vo': 10,
+    '04oDVBPIYP8h5V1eC1PSc5JU6Vo': 10,
     'OGccsuLV2xuoDau1XRc6hc7uO24': 20
   }
 }))
@@ -39,8 +39,10 @@ then build a wallet
 let lotion = require('lotion')
 let coins = require('coins')
 let client = await lotion.connect(APP_GCI)
+let { randomBytes } = require('crypto')
 
-let wallet = coins.wallet(client)
+let priv = randomBytes(32)
+let wallet = coins.wallet(priv, client)
 
 // wallet methods:
 let address = wallet.getAddress()
@@ -49,7 +51,7 @@ console.log(address) // 'OGccsuLV2xuoDau1XRc6hc7uO24'
 let balance = await wallet.getBalance()
 console.log(balance) // 20
 
-let result = await wallet.send('04oDVBPIYP8h5V1eC1PSc/JU6Vo', 5)
+let result = await wallet.send('04oDVBPIYP8h5V1eC1PSc5JU6Vo', 5)
 console.log(result) // { height: 42 }
 ```
 
@@ -67,14 +69,13 @@ let app = lotion({
 
 app.use(coins({
     name: 'testcoin',
-    initialState: {
+    initialBalances: {
       'judd': 10,
       'matt': 10
     },
-
-    modules: {
+    handlers: {
       'my-module': {
-        onInput(input, state) {
+        onInput(input, tx, state) {
           // this function is called when coins of
           // this type are used as a transaction input.
 
@@ -88,7 +89,7 @@ app.use(coins({
           state[input.senderAddress] -= input.amount
         },
 
-        onOutput(output, state) {
+        onOutput(output, tx, state) {
           // here's where you handle coins of this type
           // being received as a tx output.
 

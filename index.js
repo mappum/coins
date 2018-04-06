@@ -10,5 +10,8 @@ Object.assign(module.exports, {
   accounts: require('./src/accounts.js'),
 
   // helper functions
-  getSigHash: require('./src/sigHash.js')
+  getSigHash: require('./src/sigHash.js'),
+
+  // wallet constructor
+  wallet: require('./src/wallet.js')
 })
