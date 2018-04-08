@@ -104,17 +104,26 @@ function createOrLoadSeed (path) {
   // generate random seed
   let seed = randomBytes(32)
   mkdirp(path)
-  fs.writeFileSync(seedPath, seed, 'hex')
+  fs.writeFileSync(seedPath, seed.toString('hex'), 'utf8')
   return seed
 }
 
 function createOrLoadWallet (path = defaultPath(), client) {
+  // path is optional
   if (typeof path === 'object') {
     client = path
     path = defaultPath()
   }
 
-  let privkey = createOrLoadSeed(path)
+  let privkey
+  if (Buffer.isBuffer(path)) {
+    // user can directly specify privkey
+    privkey = path
+  } else {
+    // otherwise load from ~/.coins
+    privkey = createOrLoadSeed(path)
+  }
+
   return new Wallet(privkey, client)
 }
 
