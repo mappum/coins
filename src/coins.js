@@ -74,7 +74,8 @@ function coins (opts = {}) {
   function coinsTxHandler (state, tx, chain) {
     // ensure tx has to and from
     if (tx.from == null || tx.to == null) {
-      throw Error('Must have `to` and `from` values')
+      // not a coins tx
+      return
     }
 
     // convert tx to canonical format
