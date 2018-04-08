@@ -1,9 +1,5 @@
-let { randomBytes } = require('crypto')
-let fs = require('fs')
-let { join } = require('path')
-let mkdirp = require('mkdirp').sync
 let secp = require('secp256k1')
-let home = require('user-home')
+let old = require('old')
 let coins = require('..')
 
 // TODO: HD scheme for deriving per-GCI keys
@@ -81,50 +77,4 @@ function getAddress (pubkey) {
   return coins.secp256k1Account.getAddress({ pubkey })
 }
 
-function defaultPath () {
-  return join(home, '.coins')
-}
-
-function createOrLoadSeed (path) {
-  let seedPath = join(path, 'secret')
-
-  let exists
-  try {
-    fs.accessSync(seedPath)
-    exists = true
-  } catch (err) {
-    exists = false
-  }
-
-  // load existing seed
-  if (exists) {
-    return Buffer.from(fs.readFileSync(seedPath, 'utf8'), 'hex')
-  }
-
-  // generate random seed
-  let seed = randomBytes(32)
-  mkdirp(path)
-  fs.writeFileSync(seedPath, seed.toString('hex'), 'utf8')
-  return seed
-}
-
-function createOrLoadWallet (path = defaultPath(), client) {
-  // path is optional
-  if (typeof path === 'object') {
-    client = path
-    path = defaultPath()
-  }
-
-  let privkey
-  if (Buffer.isBuffer(path)) {
-    // user can directly specify privkey
-    privkey = path
-  } else {
-    // otherwise load from ~/.coins
-    privkey = createOrLoadSeed(path)
-  }
-
-  return new Wallet(privkey, client)
-}
-
-module.exports = createOrLoadWallet
+module.exports = old(Wallet)
