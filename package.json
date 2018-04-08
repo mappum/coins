@@ -7,8 +7,10 @@
     "bs58check": "^2.1.1",
     "clauses": "^1.1.2",
     "json-stable-stringify": "^1.0.1",
+    "mkdirp": "^0.5.1",
     "secp256k1": "^3.3.1",
-    "supercop.js": "^2.0.1"
+    "supercop.js": "^2.0.1",
+    "user-home": "^2.0.0"
   },
   "devDependencies": {
     "lotion": "^0.1.8"
