@@ -98,7 +98,7 @@ function createOrLoadSeed (path) {
 
   // load existing seed
   if (exists) {
-    return Buffer.from(fs.readFileSync(seedPath), 'hex')
+    return Buffer.from(fs.readFileSync(seedPath, 'utf8'), 'hex')
   }
 
   // generate random seed
