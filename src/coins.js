@@ -16,7 +16,7 @@ const defaultHandlers = {
 }
 
 function coins (opts = {}) {
-  let { initialBalances, handlers } = opts
+  let { handlers } = opts
 
   // get handlers from `defaultHandlers`, and optionally add more or
   // override from `opts.handlers`
@@ -48,14 +48,14 @@ function coins (opts = {}) {
   function processInput (input, tx, state, chain) {
     let onInput = getHandlerMethod(input.type, 'onInput')
     let subState = state[input.type]
-    onInput(input, tx, subState, chain)
+    onInput(input, tx, subState, chain, state)
   }
 
   // runs an output
   function processOutput (output, tx, state, chain) {
     let onOutput = getHandlerMethod(output.type, 'onOutput')
     let subState = state[output.type]
-    onOutput(output, tx, subState, chain)
+    onOutput(output, tx, subState, chain, state)
   }
 
   // lotion initializer func
