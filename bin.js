@@ -2,6 +2,7 @@
 
 let fs = require('fs')
 let os = require('os')
+const secp256k1 = require('secp256k1')
 const { randomBytes } = require('crypto')
 
 let { wallet } = require('.')
@@ -9,9 +10,13 @@ let { wallet } = require('.')
 // generates or loads wallet from default path (~/.coins)
 
 let path = os.homedir() + '/.coins'
-!fs.existsSync(path) && fs.writeFileSync(path, randomBytes(32))
-let privkey = fs.readFileSync(path)
-
+let privKey
+if (!fs.existsSync(path)) {
+  do {privKey = randomBytes(32)} while (!secp256k1.privateKeyVerify(privKey))
+  fs.writeFileSync(path, privKey)
+} else {
+  privkey = fs.readFileSync(path)
+}
 let address = wallet(privkey).address()
 
 console.error('Your Address:')
