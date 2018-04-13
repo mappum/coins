@@ -15,9 +15,10 @@ if (!fs.existsSync(path)) {
   do {privKey = randomBytes(32)} while (!secp256k1.privateKeyVerify(privKey))
   fs.writeFileSync(path, privKey.toString('hex'))
 } else {
-  privkey = Buffer.from(fs.readFileSync(path), 'hex')
+  privKey = Buffer.from(fs.readFileSync(path, 'utf8'), 'hex')
 }
-let address = wallet(privkey).address()
+
+let address = wallet(privKey).address()
 
 console.error('Your Address:')
 console.log(address)
