@@ -13,9 +13,9 @@ let path = os.homedir() + '/.coins'
 let privKey
 if (!fs.existsSync(path)) {
   do {privKey = randomBytes(32)} while (!secp256k1.privateKeyVerify(privKey))
-  fs.writeFileSync(path, privKey)
+  fs.writeFileSync(path, privKey.toString('hex'))
 } else {
-  privkey = fs.readFileSync(path)
+  privkey = Buffer.from(fs.readFileSync(path), 'hex')
 }
 let address = wallet(privkey).address()
 
