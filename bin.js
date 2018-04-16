@@ -4,7 +4,7 @@ let fs = require('fs')
 let os = require('os')
 let secp256k1 = require('secp256k1')
 let { randomBytes } = require('crypto')
-let { wallet } = require('.')
+let wallet = require('./src/wallet.js')
 
 // generates or loads wallet from default path (~/.coins)
 let path = os.homedir() + '/.coins'
