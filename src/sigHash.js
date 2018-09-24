@@ -1,5 +1,5 @@
 let { clone, sha256, normalizeTx } = require('./common.js')
-let { stringify } = require('lotion/lib/json.js')
+let { stringify } = require('deterministic-json')
 
 // gets the hash of a transaction to be used for signing
 module.exports = function getSigHash (tx) {

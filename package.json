@@ -7,6 +7,7 @@
   "dependencies": {
     "bs58check": "^2.1.1",
     "clauses": "^1.1.2",
+    "deterministic-json": "^1.0.4",
     "json-stable-stringify": "^1.0.1",
     "mkdirp": "^0.5.1",
     "old": "^0.2.0",
