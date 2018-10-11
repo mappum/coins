@@ -106,8 +106,6 @@ function coins (opts = {}) {
     for (let output of outputs) {
       processOutput(output, tx, state, chain)
     }
-
-    return state
   }
 
   function coinsBlockHandler (state, chain) {
@@ -118,21 +116,16 @@ function coins (opts = {}) {
     }
   }
 
-  return [
-    {
-      type: 'initializer',
-      middleware: coinsInitializer
-    }, {
-      type: 'tx',
-      middleware: clauses
-    }, {
-      type: 'tx',
-      middleware: coinsTxHandler
-    }, {
-      type: 'block',
-      middleware: coinsBlockHandler
+  return {
+    initializer,
+    tx,
+    methods: {
+      mint (state, output, tx, context) {
+        putCheck(output)
+        processOutput(output, tx, state, context)
+      }
     }
-  ]
+  }
 }
 
 // simple structure check for an input or an output
