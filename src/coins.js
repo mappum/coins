@@ -1,4 +1,3 @@
-let clauses = require('clauses')
 let { burnHandler, normalizeTx } = require('./common.js')
 let getSigHash = require('./sigHash.js')
 let ed25519Account = require('./ed25519Account.js')
@@ -39,7 +38,7 @@ function coins (opts = {}) {
     // get method from handler object
     let func = handler[funcName]
     if (func == null) {
-      throw Error(`Handler "${input.type}" does not implement "${funcName}"`)
+      throw Error(`Handler "${type}" does not implement "${funcName}"`)
     }
     return func
   }
@@ -65,7 +64,7 @@ function coins (opts = {}) {
       let { initialState, initialize } = handlers[handlerName]
       state[handlerName] = initialState || {}
       if (initialize) {
-        initialize(state[handlerName], chainInfo, opts)
+        initialize(state[handlerName], context, opts)
       }
     }
   }

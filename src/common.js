@@ -1,5 +1,4 @@
 let { createHash } = require('crypto')
-let stableStringify = require('json-stable-stringify')
 let base58check = require('bs58check')
 
 function hashFunc (algo) {
