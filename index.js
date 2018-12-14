@@ -11,6 +11,8 @@ Object.assign(module.exports, {
 
   // helper functions
   getSigHash: require('./src/sigHash.js'),
+  addressHash: require('./src/common.js').addressHash,
+  hashToAddress: require('./src/common.js').hashToAddress,
 
   // wallet constructor
   wallet: require('./src/wallet.js')

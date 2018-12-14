@@ -11,6 +11,10 @@ let ripemd160 = hashFunc('ripemd160')
 
 function addressHash (data) {
   let hash = ripemd160(sha256(data))
+  return hashToAddress(hash)
+}
+
+function hashToAddress (hash) {
   return base58check.encode(hash)
 }
 
@@ -63,6 +67,7 @@ module.exports = {
   sha256,
   ripemd160,
   addressHash,
+  hashToAddress,
   burnHandler,
   normalizeTx,
   clone
