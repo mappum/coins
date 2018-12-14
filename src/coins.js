@@ -45,21 +45,21 @@ function coins (opts = {}) {
   }
 
   // runs an input
-  function processInput (input, tx, state, chain) {
+  function processInput (input, tx, state, context) {
     let onInput = getHandlerMethod(input.type, 'onInput')
     let subState = state[input.type]
-    onInput(input, tx, subState, chain, state)
+    onInput(input, tx, subState, context)
   }
 
   // runs an output
-  function processOutput (output, tx, state, chain) {
+  function processOutput (output, tx, state, context) {
     let onOutput = getHandlerMethod(output.type, 'onOutput')
     let subState = state[output.type]
-    onOutput(output, tx, subState, chain, state)
+    onOutput(output, tx, subState, context)
   }
 
   // lotion initializer func
-  function coinsInitializer (state, chainInfo) {
+  function coinsInitializer (state, context) {
     // initialize handlers
     for (let handlerName in handlers) {
       let { initialState, initialize } = handlers[handlerName]
@@ -71,7 +71,7 @@ function coins (opts = {}) {
   }
 
   // lotion tx handler func
-  function coinsTxHandler (state, tx, chain) {
+  function coinsTxHandler (state, tx, context) {
     // ensure tx has to and from
     if (tx.from == null || tx.to == null) {
       // not a coins tx
@@ -101,18 +101,18 @@ function coins (opts = {}) {
 
     // process inputs and outputs
     for (let input of inputs) {
-      processInput(input, tx, state, chain)
+      processInput(input, tx, state, context)
     }
     for (let output of outputs) {
-      processOutput(output, tx, state, chain)
+      processOutput(output, tx, state, context)
     }
   }
 
-  function coinsBlockHandler (state, chain) {
+  function coinsBlockHandler (state, context) {
     for (let handlerName in handlers) {
       let blockHandler = handlers[handlerName].onBlock
       if (blockHandler == null) continue
-      blockHandler(state[handlerName], chain)
+      blockHandler(state[handlerName], context)
     }
   }
 
