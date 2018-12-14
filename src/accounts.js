@@ -23,7 +23,7 @@ function accounts (handlers) {
 
   return {
     // on spend, debit from sender's account
-    onInput (input, tx, state) {
+    onInput (input, state, context) {
       let { amount, sequence, accountType } = input
 
       if (!Number.isInteger(sequence)) {
@@ -57,7 +57,7 @@ function accounts (handlers) {
       }
 
       // should throw if input is not allowed to spend
-      handler.onSpend(input, tx)
+      handler.onSpend(input, context)
 
       // debit account
       account.balance -= amount
@@ -65,7 +65,7 @@ function accounts (handlers) {
     },
 
     // for each output of this type, add to account
-    onOutput ({ address, amount }, tx, state) {
+    onOutput ({ address, amount }, state, context) {
       // initialize empty accounts
       if (state[address] == null) {
         state[address] = { balance: 0, sequence: 0 }
@@ -74,12 +74,13 @@ function accounts (handlers) {
       // add to account
       state[address].balance += amount
 
-      if (state[address].balance > Number.MAX_SAFE_INTEGER) {
-        throw Error('Account balance overflow')
+      // sanity check, prevents overflow
+      if (!Number.isSafeInteger(state[address].balance)) {
+        throw Error('Error adding to account balance')
       }
     },
 
-    initialize (state, chainInfo, coinOpts) {
+    initialize (state, context, coinOpts) {
       let initialBalances = coinOpts.initialBalances
       if (initialBalances == null) return
 

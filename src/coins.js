@@ -45,21 +45,21 @@ function coins (opts = {}) {
   }
 
   // runs an input
-  function processInput (input, tx, state, context) {
+  function processInput (input, state, context) {
     let onInput = getHandlerMethod(input.type, 'onInput')
     let subState = state[input.type]
-    onInput(input, tx, subState, context)
+    onInput(input, subState, context)
   }
 
   // runs an output
-  function processOutput (output, tx, state, context) {
+  function processOutput (output, state, context) {
     let onOutput = getHandlerMethod(output.type, 'onOutput')
     let subState = state[output.type]
-    onOutput(output, tx, subState, context)
+    onOutput(output, subState, context)
   }
 
-  // lotion initializer func
-  function coinsInitializer (state, context) {
+  // run at chain genesis
+  function initializer (state, context) {
     // initialize handlers
     for (let handlerName in handlers) {
       let { initialState, initialize } = handlers[handlerName]
@@ -70,8 +70,8 @@ function coins (opts = {}) {
     }
   }
 
-  // lotion tx handler func
-  function coinsTxHandler (state, tx, context) {
+  // run every time there is a tx routed to this coin
+  function txHandler (state, tx, context) {
     // ensure tx has to and from
     if (tx.from == null || tx.to == null) {
       // not a coins tx
@@ -95,20 +95,22 @@ function coins (opts = {}) {
       throw Error('Sum of inputs and outputs must match')
     }
 
-    // add properties to tx object
+    // add properties to context
     // TODO: use a getter func (and cache the result)
-    tx.sigHash = getSigHash({ from: inputs, to: outputs })
+    context.sigHash = getSigHash({ from: inputs, to: outputs })
+    context.transaction = tx
 
     // process inputs and outputs
     for (let input of inputs) {
-      processInput(input, tx, state, context)
+      processInput(input, state, context)
     }
     for (let output of outputs) {
-      processOutput(output, tx, state, context)
+      processOutput(output, state, context)
     }
   }
 
-  function coinsBlockHandler (state, context) {
+  // run at the end of every block
+  function blockHandler (state, context) {
     for (let handlerName in handlers) {
       let blockHandler = handlers[handlerName].onBlock
       if (blockHandler == null) continue
@@ -118,11 +120,16 @@ function coins (opts = {}) {
 
   return {
     initializer,
-    tx,
+    txHandler,
+    blockHandler,
+
     methods: {
-      mint (state, output, tx, context) {
+      mint (state, output, context) {
+        // output format check
         putCheck(output)
-        processOutput(output, tx, state, context)
+
+        // run handler as if we are processing a tx with this output
+        processOutput(output, state, context)
       }
     }
   }
@@ -142,14 +149,14 @@ function putCheck (put) {
   if (!Number.isInteger(put.amount)) {
     throw Error('Amount must be an integer')
   }
-  if (put.amount > Number.MAX_SAFE_INTEGER) {
+  if (!Number.isSafeInteger(put.amount)) {
     throw Error('Amount must be < 2^53')
   }
 }
 
 function sumAmounts (puts) {
   let sum = puts.reduce((sum, { amount }) => sum + amount, 0)
-  if (sum > Number.MAX_SAFE_INTEGER) {
+  if (!Number.isSafeInteger(sum)) {
     throw Error('Amount overflow')
   }
   return sum
