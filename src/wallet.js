@@ -7,7 +7,7 @@ let coins = require('..')
 // TODO: support user-provided seed
 
 class Wallet {
-  constructor (privkey, client) {
+  constructor (privkey, client, opts = {}) {
     if (!Buffer.isBuffer(privkey) || privkey.length !== 32) {
       throw Error('"privkey" must be a 32-byte Buffer')
     }
@@ -16,15 +16,23 @@ class Wallet {
     this.privkey = privkey
     this.pubkey = secp.publicKeyCreate(this.privkey)
     this._address = getAddress(this.pubkey)
+    this.route = opts.route
   }
 
   address () {
     return this._address
   }
 
+  state () {
+    if (this.route) {
+      return this.client.state[this.route]
+    }
+    return this.client.state
+  }
+
   async balance () {
     this.assertClient()
-    let accounts = this.client.state.accounts
+    let accounts = this.state().accounts
     let account = await accounts[this._address]
     if (account == null) {
       return 0
@@ -42,7 +50,7 @@ class Wallet {
     }
 
     // get our account sequence number
-    let accounts = this.client.state.accounts
+    let accounts = this.state().accounts
     let account = await accounts[this._address]
 
     // build tx
