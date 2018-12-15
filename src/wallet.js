@@ -65,6 +65,9 @@ class Wallet {
         address: toAddress
       }
     }
+    if (this.route) {
+      tx.type = this.route
+    }
 
     // sign tx
     let sigHash = coins.getSigHash(tx)
