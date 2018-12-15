@@ -1,6 +1,6 @@
 {
   "name": "coins",
-  "version": "4.1.0",
+  "version": "4.1.1",
   "description": "Easy cryptocurrency middleware for Lotion",
   "main": "index.js",
   "bin": "./bin.js",
