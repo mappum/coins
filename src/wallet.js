@@ -40,13 +40,26 @@ class Wallet {
     return account.balance
   }
 
-  async send (toAddress, amount) {
+  async send (to, amount) {
     this.assertClient()
-    if (typeof toAddress !== 'string') {
-      throw Error('"toAddress" must be a string')
-    }
-    if (!Number.isInteger(amount)) {
-      throw Error('"amount" must be an integer')
+
+    if (typeof to === 'string') {
+      // to is an address string
+      if (!Number.isInteger(amount)) {
+        throw Error('"amount" must be an integer')
+      }
+      // convert to output object
+      to = {
+        amount,
+        address: to
+      }
+    } else {
+      // to is an output object
+      // TODO: support array of multiple outputs
+      if (!Number.isInteger(to.amount)) {
+        throw Error('Output must have an amount')
+      }
+      amount = to.amount
     }
 
     // get our account sequence number
@@ -60,10 +73,7 @@ class Wallet {
         sequence: account ? account.sequence : 0,
         pubkey: this.pubkey
       },
-      to: {
-        amount,
-        address: toAddress
-      }
+      to
     }
     if (this.route) {
       tx.type = this.route
