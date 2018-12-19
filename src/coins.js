@@ -96,7 +96,7 @@ function coins (opts = {}) {
 
     // add properties to context
     // TODO: use a getter func (and cache the result)
-    context.sigHash = getSigHash({ from: inputs, to: outputs })
+    context.sigHash = getSigHash(tx)
     context.transaction = tx
 
     // process inputs and outputs
