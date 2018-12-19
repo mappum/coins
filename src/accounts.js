@@ -1,6 +1,8 @@
+const noHandlersError = Error('Must specify one or more account handlers')
+
 function accounts (handlers) {
   if (handlers == null) {
-    throw Error('Must specify one or more account handlers')
+    throw noHandlersError
   }
 
   // check if handlers obj is actually a single handler
@@ -16,7 +18,11 @@ function accounts (handlers) {
     var handler = handlers
     checkHandler(handler)
   } else {
-    for (let handler of Object.values(handlers)) {
+    let values = Object.values(handlers)
+    if (values.length === 0) {
+      throw noHandlersError
+    }
+    for (let handler of values) {
       checkHandler(handler)
     }
   }
@@ -29,11 +35,12 @@ function accounts (handlers) {
       if (!Number.isInteger(sequence)) {
         throw Error('Sequence number must be an integer')
       }
-      if (typeof accountType !== 'string') {
-        throw Error('Account type must be a string')
-      }
 
       if (!singleHandler) {
+        if (typeof accountType !== 'string') {
+          throw Error('Account type must be a string')
+        }
+
         // get account handler from 'accountType' value
         handler = handlers[accountType]
         if (handler == null) {
@@ -66,6 +73,13 @@ function accounts (handlers) {
 
     // for each output of this type, add to account
     onOutput ({ address, amount }, state, context) {
+      if (typeof address !== 'string') {
+        throw Error('Address is required')
+      }
+      if (!Number.isSafeInteger(amount)) {
+        throw Error('Invalid amount')
+      }
+
       // initialize empty accounts
       if (state[address] == null) {
         state[address] = { balance: 0, sequence: 0 }
