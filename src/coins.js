@@ -74,7 +74,7 @@ function coins (opts = {}) {
     // ensure tx has to and from
     if (tx.from == null || tx.to == null) {
       // not a coins tx
-      return
+      throw Error('Not a valid coins transaction, must have "to" and "from"')
     }
 
     // convert tx to canonical format
@@ -82,6 +82,9 @@ function coins (opts = {}) {
     normalizeTx(tx)
     let inputs = tx.from
     let outputs = tx.to
+    if (inputs.length === 0) {
+      throw Error('Must have at least 1 input')
+    }
 
     // simple input/output checks (must have types and amounts)
     inputs.forEach(putCheck)
