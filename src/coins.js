@@ -120,21 +120,21 @@ function coins (opts = {}) {
     }
   }
 
-  let module = [
-    { type: 'initializer', middleware: initializer },
-    { type: 'tx', middleware: txHandler },
-    { type: 'block', middleware: blockHandler }
-  ]
-  module.methods = {
-    mint (state, output, context) {
-      // output format check
-      putCheck(output)
+  return {
+    initializers: [ initializer ],
+    transactionHandlers: [ txHandler ],
+    blockHandlers: [ blockHandler ],
 
-      // run handler as if we are processing a tx with this output
-      processOutput(output, state, context)
+    methods: {
+      mint (state, output, context) {
+        // output format check
+        putCheck(output)
+
+        // run handler as if we are processing a tx with this output
+        processOutput(output, state, context)
+      }
     }
   }
-  return module
 }
 
 // simple structure check for an input or an output
