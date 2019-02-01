@@ -118,6 +118,7 @@ function getAccount (state, address) {
   if (account == null) {
     throw Error(`Non-existent account "${address}"`)
   }
+  return account
 }
 
 module.exports = accounts

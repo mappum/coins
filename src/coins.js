@@ -132,6 +132,30 @@ function coins (opts = {}) {
 
         // run handler as if we are processing a tx with this output
         processOutput(output, state, context)
+      },
+
+      // removes balance from an account without validating any rules
+      burn (state, address, amount) {
+        if (amount < 0) {
+          throw Error('Amount must be >= 0')
+        }
+        if (!Number.isInteger(amount)) {
+          throw Error('Amount must be an integer')
+        }
+        if (!Number.isSafeInteger(amount)) {
+          throw Error('Amount must be < 2^53')
+        }
+
+        let account = accounts.getAccount(state.accounts, address)
+        if (account.balance < amount) {
+          throw Error('Insufficient funds')
+        }
+
+        account.balance -= amount
+      },
+
+      getAccount (state, address) {
+        return accounts.getAccount(state.accounts, address)
       }
     }
   }
