@@ -82,10 +82,10 @@ function coins (opts = {}) {
 
   function setContextProperties (state, context) {
     context = Object.assign({}, context)
-
     for (let key in methods) {
       context[key] = methods[key].bind(null, state)
     }
+    return context
   }
 
   // runs an input
