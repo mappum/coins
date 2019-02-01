@@ -1,4 +1,4 @@
-let { burnHandler, normalizeTx } = require('./common.js')
+let { burnHandler, normalizeTx, normalizeOutput } = require('./common.js')
 let getSigHash = require('./sigHash.js')
 let ed25519Account = require('./ed25519Account.js')
 let secp256k1Account = require('./secp256k1Account.js')
@@ -43,6 +43,47 @@ function coins (opts = {}) {
     return func
   }
 
+  let methods = {
+    mint (state, output, context) {
+      // set default properties
+      normalizeOutput(output)
+
+      // output format check
+      putCheck(output)
+
+      // run handler as if we are processing a tx with this output
+      processOutput(output, state, context)
+    },
+
+    // removes balance from an account without validating any rules
+    burn (state, address, amount) {
+      if (amount < 0) {
+        throw Error('Amount must be >= 0')
+      }
+      if (!Number.isInteger(amount)) {
+        throw Error('Amount must be an integer')
+      }
+      if (!Number.isSafeInteger(amount)) {
+        throw Error('Amount must be < 2^53')
+      }
+
+      let account = accounts.getAccount(state.accounts, address)
+      if (account.balance < amount) {
+        throw Error('Insufficient funds')
+      }
+
+      account.balance -= amount
+    },
+
+    getAccount (state, address) {
+      return accounts.getAccount(state.accounts, address)
+    }
+  }
+
+  function setContextProperties (context) {
+    return Object.assign({}, context, { ...methods })
+  }
+
   // runs an input
   function processInput (input, state, context) {
     let onInput = getHandlerMethod(input.type, 'onInput')
@@ -59,6 +100,8 @@ function coins (opts = {}) {
 
   // run at chain genesis
   function initializer (state, context) {
+    context = setContextProperties(context)
+
     // initialize handlers
     for (let handlerName in handlers) {
       let { initialState, initialize } = handlers[handlerName]
@@ -76,6 +119,8 @@ function coins (opts = {}) {
       // not a coins tx
       throw Error('Not a valid coins transaction, must have "to" and "from"')
     }
+
+    context = setContextProperties(context)
 
     // convert tx to canonical format
     // (e.g. ensure `to` and `from` are arrays)
@@ -113,6 +158,8 @@ function coins (opts = {}) {
 
   // run at the end of every block
   function blockHandler (state, context) {
+    context = setContextProperties(context)
+
     for (let handlerName in handlers) {
       let blockHandler = handlers[handlerName].onBlock
       if (blockHandler == null) continue
@@ -124,40 +171,7 @@ function coins (opts = {}) {
     initializers: [ initializer ],
     transactionHandlers: [ txHandler ],
     blockHandlers: [ blockHandler ],
-
-    methods: {
-      mint (state, output, context) {
-        // output format check
-        putCheck(output)
-
-        // run handler as if we are processing a tx with this output
-        processOutput(output, state, context)
-      },
-
-      // removes balance from an account without validating any rules
-      burn (state, address, amount) {
-        if (amount < 0) {
-          throw Error('Amount must be >= 0')
-        }
-        if (!Number.isInteger(amount)) {
-          throw Error('Amount must be an integer')
-        }
-        if (!Number.isSafeInteger(amount)) {
-          throw Error('Amount must be < 2^53')
-        }
-
-        let account = accounts.getAccount(state.accounts, address)
-        if (account.balance < amount) {
-          throw Error('Insufficient funds')
-        }
-
-        account.balance -= amount
-      },
-
-      getAccount (state, address) {
-        return accounts.getAccount(state.accounts, address)
-      }
-    }
+    methods
   }
 }
 

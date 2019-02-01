@@ -45,9 +45,7 @@ function normalizeTx (tx) {
 
   // if output has address and no type, infer that type is 'accounts'
   for (let output of tx.to) {
-    if (output.type != null) continue
-    if (output.address == null) continue
-    output.type = 'accounts'
+    normalizeOutput(output)
   }
 
   // if there is only 1 input and it has no amount, set amount
@@ -56,6 +54,12 @@ function normalizeTx (tx) {
     let amountOut = tx.to.reduce((sum, { amount }) => sum + amount, 0)
     tx.from[0].amount = amountOut
   }
+}
+
+function normalizeOutput (output) {
+  if (output.type != null) return
+  if (output.address == null) return
+  output.type = 'accounts'
 }
 
 function clone (obj) {
@@ -69,5 +73,6 @@ module.exports = {
   hashToAddress,
   burnHandler,
   normalizeTx,
+  normalizeOutput,
   clone
 }
