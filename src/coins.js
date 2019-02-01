@@ -80,8 +80,12 @@ function coins (opts = {}) {
     }
   }
 
-  function setContextProperties (context) {
-    return Object.assign({}, context, { ...methods })
+  function setContextProperties (state, context) {
+    context = Object.assign({}, context)
+
+    for (let key in methods) {
+      context[key] = methods[key].bind(null, state)
+    }
   }
 
   // runs an input
@@ -100,7 +104,7 @@ function coins (opts = {}) {
 
   // run at chain genesis
   function initializer (state, context) {
-    context = setContextProperties(context)
+    context = setContextProperties(state, context)
 
     // initialize handlers
     for (let handlerName in handlers) {
@@ -120,7 +124,7 @@ function coins (opts = {}) {
       throw Error('Not a valid coins transaction, must have "to" and "from"')
     }
 
-    context = setContextProperties(context)
+    context = setContextProperties(state, context)
 
     // convert tx to canonical format
     // (e.g. ensure `to` and `from` are arrays)
@@ -158,7 +162,7 @@ function coins (opts = {}) {
 
   // run at the end of every block
   function blockHandler (state, context) {
-    context = setContextProperties(context)
+    context = setContextProperties(state, context)
 
     for (let handlerName in handlers) {
       let blockHandler = handlers[handlerName].onBlock
