@@ -50,10 +50,7 @@ function accounts (handlers) {
 
       // get account
       let address = handler.getAddress(input)
-      let account = state[address]
-      if (account == null) {
-        throw Error(`Non-existent account "${address}"`)
-      }
+      let account = getAccount(state, address)
 
       // verify account balance/sequence
       if (account.balance < amount) {
@@ -116,4 +113,12 @@ function checkHandler ({ onSpend, getAddress }) {
   }
 }
 
+function getAccount (state, address) {
+  let account = state[address]
+  if (account == null) {
+    throw Error(`Non-existent account "${address}"`)
+  }
+}
+
 module.exports = accounts
+module.exports.getAccount = getAccount
