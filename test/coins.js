@@ -1,17 +1,16 @@
 let test = require('tape')
 let coins = require('..')
 
-function getHandler (module, type) {
-  // TODO: update for object modules
-  return module
-    .find((h) => h.type === type)
-    .middleware
+function getHandler (handlers) {
+  return (...args) => {
+    handlers.forEach((f) => f(...args))
+  }
 }
 
 test('initializer', (t) => {
   t.test('no options', (t) => {
     let c = coins()
-    let initializer = getHandler(c, 'initializer')
+    let initializer = getHandler(c.initializers)
 
     let state = {}
     initializer(state, {})
@@ -28,7 +27,7 @@ test('initializer', (t) => {
         'foo': 123
       }
     })
-    let initializer = getHandler(c, 'initializer')
+    let initializer = getHandler(c.initializers)
 
     let state = {}
     initializer(state, {})
@@ -47,7 +46,7 @@ test('initializer', (t) => {
         }
       }
     })
-    let initializer = getHandler(c, 'initializer')
+    let initializer = getHandler(c.initializers)
 
     let state = {}
     initializer(state, {})
@@ -67,7 +66,9 @@ test('initializer', (t) => {
         foo: {
           initialize: (state2, context2, opts2) => {
             t.equals(state2, state.foo)
-            t.equals(context2, context)
+            t.true('mint' in context2)
+            t.true('burn' in context2)
+            t.true('getAccount' in context2)
             t.equals(opts2, opts)
             state2.bar = 'baz'
           }
@@ -75,7 +76,7 @@ test('initializer', (t) => {
       }
     }
     let c = coins(opts)
-    let initializer = getHandler(c, 'initializer')
+    let initializer = getHandler(c.initializers)
 
     initializer(state, context)
 
@@ -96,7 +97,9 @@ test('initializer', (t) => {
           initialize: (state2, context2, opts2) => {
             t.equals(state2.bar, 123)
             t.equals(state2, state.foo)
-            t.equals(context2, context)
+            t.true('mint' in context2)
+            t.true('burn' in context2)
+            t.true('getAccount' in context2)
             t.equals(opts2, opts)
             state2.bar = 'baz'
           }
@@ -104,7 +107,7 @@ test('initializer', (t) => {
       }
     }
     let c = coins(opts)
-    let initializer = getHandler(c, 'initializer')
+    let initializer = getHandler(c.initializers)
 
     initializer(state, context)
 
@@ -121,7 +124,7 @@ test('initializer', (t) => {
 test('tx handler', (t) => {
   t.test('missing from', (t) => {
     let c = coins()
-    let txHandler = getHandler(c, 'tx')
+    let txHandler = getHandler(c.transactionHandlers)
 
     let state = {}
     try {
@@ -136,7 +139,7 @@ test('tx handler', (t) => {
 
   t.test('missing to', (t) => {
     let c = coins()
-    let txHandler = getHandler(c, 'tx')
+    let txHandler = getHandler(c.transactionHandlers)
 
     let state = {}
     try {
@@ -151,7 +154,7 @@ test('tx handler', (t) => {
 
   t.test('with no inputs or outputs', (t) => {
     let c = coins()
-    let txHandler = getHandler(c, 'tx')
+    let txHandler = getHandler(c.transactionHandlers)
 
     let state = {}
     try {
@@ -166,7 +169,7 @@ test('tx handler', (t) => {
 
   t.test('with invalid input amount', (t) => {
     let c = coins()
-    let txHandler = getHandler(c, 'tx')
+    let txHandler = getHandler(c.transactionHandlers)
 
     let state = {}
     try {
@@ -184,7 +187,7 @@ test('tx handler', (t) => {
 
   t.test('with negative input amount', (t) => {
     let c = coins()
-    let txHandler = getHandler(c, 'tx')
+    let txHandler = getHandler(c.transactionHandlers)
 
     let state = {}
     try {
@@ -202,7 +205,7 @@ test('tx handler', (t) => {
 
   t.test('with floating-point input amount', (t) => {
     let c = coins()
-    let txHandler = getHandler(c, 'tx')
+    let txHandler = getHandler(c.transactionHandlers)
 
     let state = {}
     try {
@@ -220,7 +223,7 @@ test('tx handler', (t) => {
 
   t.test('with oversized input amount', (t) => {
     let c = coins()
-    let txHandler = getHandler(c, 'tx')
+    let txHandler = getHandler(c.transactionHandlers)
 
     let state = {}
     try {
@@ -245,7 +248,7 @@ test('tx handler', (t) => {
         }
       }
     })
-    let txHandler = getHandler(c, 'tx')
+    let txHandler = getHandler(c.transactionHandlers)
 
     try {
       txHandler({}, {
@@ -273,7 +276,7 @@ test('tx handler', (t) => {
         }
       }
     })
-    let txHandler = getHandler(c, 'tx')
+    let txHandler = getHandler(c.transactionHandlers)
 
     try {
       txHandler({}, {
@@ -298,7 +301,7 @@ test('tx handler', (t) => {
 
   t.test('missing handler', (t) => {
     let c = coins()
-    let txHandler = getHandler(c, 'tx')
+    let txHandler = getHandler(c.transactionHandlers)
 
     try {
       txHandler({}, {
@@ -325,7 +328,7 @@ test('tx handler', (t) => {
         }
       }
     })
-    let txHandler = getHandler(c, 'tx')
+    let txHandler = getHandler(c.transactionHandlers)
 
     try {
       txHandler({}, {
@@ -352,7 +355,7 @@ test('tx handler', (t) => {
         }
       }
     })
-    let txHandler = getHandler(c, 'tx')
+    let txHandler = getHandler(c.transactionHandlers)
 
     try {
       txHandler({}, {
@@ -402,7 +405,7 @@ test('tx handler', (t) => {
         }
       }
     })
-    let txHandler = getHandler(c, 'tx')
+    let txHandler = getHandler(c.transactionHandlers)
 
     txHandler(state, tx, { lol: 4 })
   })
@@ -434,7 +437,7 @@ test('tx handler', (t) => {
         }
       }
     })
-    let txHandler = getHandler(c, 'tx')
+    let txHandler = getHandler(c.transactionHandlers)
 
     txHandler(state, tx, { lol: 4 })
   })
@@ -445,14 +448,14 @@ test('tx handler', (t) => {
 test('block handler', (t) => {
   t.test('default', (t) => {
     let c = coins()
-    let blockHandler = getHandler(c, 'block')
+    let blockHandler = getHandler(c.blockHandlers)
     blockHandler({}, {})
     t.pass()
     t.end()
   })
 
   t.test('handler', (t) => {
-    t.plan(2)
+    t.plan(4)
     let state = { foo: {} }
     let context = {}
     let c = coins({
@@ -460,12 +463,14 @@ test('block handler', (t) => {
         foo: {
           onBlock (state2, context2) {
             t.equals(state2, state.foo)
-            t.equals(context2, context)
+            t.true('mint' in context2)
+            t.true('burn' in context2)
+            t.true('getAccount' in context2)
           }
         }
       }
     })
-    let blockHandler = getHandler(c, 'block')
+    let blockHandler = getHandler(c.blockHandlers)
     blockHandler(state, context)
   })
 
