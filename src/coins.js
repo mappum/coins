@@ -15,7 +15,7 @@ const defaultHandlers = {
 }
 
 function coins (opts = {}) {
-  let { handlers } = opts
+  let { handlers, minFee } = opts
 
   // get handlers from `defaultHandlers`, and optionally add more or
   // override from `opts.handlers`
@@ -23,8 +23,13 @@ function coins (opts = {}) {
 
   // specify default fee handler if none given
   if (handlers.fee == null) {
-    // TODO: use a better default fee handler
     handlers.fee = burnHandler
+  }
+
+  if (minFee != null) {
+    if (!Number.isSafeInteger(minFee) || minFee <= 0) {
+      throw Error('Invalid minFee option')
+    }
   }
 
   // accesses a method from a handler
@@ -144,6 +149,17 @@ function coins (opts = {}) {
     let amountOut = sumAmounts(outputs)
     if (amountIn !== amountOut) {
       throw Error('Sum of inputs and outputs must match')
+    }
+
+    // if minFee specified, last output must be type "fee"
+    if (minFee > 0) {
+      let lastOutput = outputs[outputs.length - 1]
+      if (lastOutput.type !== 'fee') {
+        throw Error('Must pay fee')
+      }
+      if (lastOutput.amount < minFee) {
+        throw Error(`Must pay fee of at least ${minFee}`)
+      }
     }
 
     // add properties to context
