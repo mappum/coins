@@ -53,9 +53,17 @@ class Wallet {
         amount,
         address: to
       }
+    } else if (Array.isArray(to)) {
+      // to is an output object
+      amount = 0
+      for (let output of to) {
+        if (!Number.isInteger(output.amount)) {
+          throw Error('Output must have an amount')
+        }
+        amount += output.amount
+      }
     } else {
       // to is an output object
-      // TODO: support array of multiple outputs
       if (!Number.isInteger(to.amount)) {
         throw Error('Output must have an amount')
       }
