@@ -476,3 +476,125 @@ test('block handler', (t) => {
 
   t.end()
 })
+
+test('minFee option', (t) => {
+  t.test('no fee', (t) => {
+    let c = coins({
+      minFee: 123,
+      handlers: {
+        foo: {
+          onInput () {},
+          onOutput () {}
+        }
+      }
+    })
+    let state = {}
+    let transactionHandler = getHandler(c.transactionHandlers)
+    try {
+      transactionHandler(state, {
+        from: { type: 'foo', amount: 100 },
+        to: { type: 'foo', amount: 100 }
+      })
+      t.fail()
+    } catch (err) {
+      t.equals(err.message, 'Must pay fee')
+    }
+    t.end()
+  })
+
+  t.test('less than minimum', (t) => {
+    let c = coins({
+      minFee: 123,
+      handlers: {
+        foo: {
+          onInput () {},
+          onOutput () {}
+        }
+      }
+    })
+    let state = {}
+    let transactionHandler = getHandler(c.transactionHandlers)
+    try {
+      transactionHandler(state, {
+        from: { type: 'foo', amount: 100 },
+        to: { type: 'fee', amount: 100 }
+      })
+      t.fail()
+    } catch (err) {
+      t.equals(err.message, 'Must pay fee of at least 123')
+    }
+    t.end()
+  })
+
+  t.test('not last output', (t) => {
+    let c = coins({
+      minFee: 100,
+      handlers: {
+        foo: {
+          onInput () {},
+          onOutput () {}
+        }
+      }
+    })
+    let state = {}
+    let transactionHandler = getHandler(c.transactionHandlers)
+    try {
+      transactionHandler(state, {
+        from: { type: 'foo', abc: 123, amount: 200 },
+        to: [
+          { type: 'fee', amount: 100 },
+          { type: 'foo', amount: 100 }
+        ]
+      })
+      t.fail()
+    } catch (err) {
+      t.equals(err.message, 'Must pay fee')
+    }
+    t.end()
+  })
+
+  t.test('sufficient fee', (t) => {
+    let c = coins({
+      minFee: 100,
+      handlers: {
+        foo: {
+          onInput () {},
+          onOutput () {}
+        }
+      }
+    })
+    let state = {}
+    let transactionHandler = getHandler(c.transactionHandlers)
+    transactionHandler(state, {
+      from: { type: 'foo', abc: 123, amount: 200 },
+      to: [
+        { type: 'foo', amount: 100 },
+        { type: 'fee', amount: 100 }
+      ]
+    })
+    t.pass()
+    t.end()
+  })
+
+  t.test('sufficient fee (single)', (t) => {
+    let c = coins({
+      minFee: 100,
+      handlers: {
+        foo: {
+          onInput () {},
+          onOutput () {}
+        }
+      }
+    })
+    let state = {}
+    let transactionHandler = getHandler(c.transactionHandlers)
+    transactionHandler(state, {
+      from: { type: 'foo', abc: 123, amount: 100 },
+      to: { type: 'fee', def: 456, amount: 100 }
+    })
+    t.pass()
+    t.end()
+  })
+
+  t.end()
+})
